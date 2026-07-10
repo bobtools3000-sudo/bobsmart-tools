@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Expense Splitter</title>
+    <style>
+        :root {
+            --primary: #2ecc71;
+            --dark: #27ae60;
+            --bg: #f5f6fa;
+            --text: #2c3e50;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        h1 { text-align: center; color: var(--dark); margin-bottom: 25px; }
+        .section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 5px solid var(--primary);
+        }
+        h3 { margin-top: 0; color: #34495e; }
+        .form-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        input, select {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #dcdde1;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn:hover { background: var(--dark); }
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            background: #fff;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            border: 1px solid #edf2f7;
+        }
+        .badge {
+            background: #e8f8f5;
+            color: var(--dark);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Smart Expense Splitter 💰📊</h1>
+    
+    <div class="section">
+        <h3>1. Add Group Members</h3>
+        <div class="form-group">
+            <input type="text" id="member-name" placeholder="Enter member name (e.g., John)">
+            <button class="btn" onclick="addMember()">Add Member</button>
+        </div>
+        <div id="members-list" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;"></div>
+    </div>
+
+    <div class="section">
+        <h3>2. Add an Expense</h3>
+        <div class="form-group">
+            <select id="expense-payer">
+                <option value="">Who paid?</option>
+            </select>
+            <input type="number" id="expense-amount" placeholder="Amount ($)">
+            <input type="text" id="expense-desc" placeholder="For what? (e.g., Dinner)">
+            <button class="btn" onclick="addExpense()">Add Expense</button>
+        </div>
+    </div>
+
+    <div class="grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div>
+            <h3>Expenses Log</h3>
+            <div id="expenses-log"></div>
+        </div>
+        <div>
+            <h3>Who Owes Whom</h3>
+            <div id="balances-output"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let members = [];
+    let expenses = [];
+
+    function addMember() {
+        const nameInput = document.getElementById('member-name');
+        const name = nameInput.value.trim();
+        if(!name) return alert("Please enter a valid name!");
+        if(members.includes(name)) return alert("Name already exists!");
+
+        members.push(name);
+        nameInput.value = '';
+        renderMembers();
+    }
+
+    function renderMembers() {
+        const listContainer = document.getElementById('members-list');
+        const payerSelect = document.getElementById('expense-payer');
+        
+        listContainer.innerHTML = '';
+        payerSelect.innerHTML = '<option value="">Who paid?</option>';
+
+        members.forEach(m => {
+            listContainer.innerHTML += `<span class="badge">${m}</span>`;
+            payerSelect.innerHTML += `<option value="${m}">${m}</option>`;
+        });
+        calculateBalances();
+    }
+
+    function addExpense() {
+        const payer = document.getElementById('expense-payer').value;
+        const amount = parseFloat(document.getElementById('expense-amount').value);
+        const desc = document.getElementById('expense-desc').value.trim() || 'Shared Expense';
+
+        if(!payer || isNaN(amount) || amount <= 0) {
+            return alert("Please select a payer and enter a valid positive amount!");
+        }
+        if(members.length < 2) {
+            return alert("Please add at least 2 members to split expenses!");
+        }
+
+        expenses.push({ payer, amount, desc });
+        document.getElementById('expense-amount').value = '';
+        document.getElementById('expense-desc').value = '';
+        
+        renderExpensesLog();
+        calculateBalances();
+    }
+
+    function renderExpensesLog() {
+        const log = document.getElementById('expenses-log');
+        log.innerHTML = '';
+        expenses.forEach(e => {
+            log.innerHTML += `
+                <div class="list-item">
+                    <span><strong>${e.payer}</strong> paid for ${e.desc}</span>
+                    <span style="color: #e74c3c; font-weight:bold;">$${e.amount.toFixed(2)}</span>
+                </div>
+            `;
+        });
+    }
+
+    function calculateBalances() {
+        const output = document.getElementById('balances-output');
+        output.innerHTML = '';
+
+        if (members.length === 0) return;
+
+        let balances = {};
+        members.forEach(m => balances[m] = 0);
+
+        // حساب صافي كل شخص
+        expenses.forEach(e => {
+            const share = e.amount / members.length;
+            members.forEach(m => {
+                if (m === e.payer) {
+                    balances[m] += (e.amount - share);
+                } else {
+                    balances[m] -= share;
+                }
+            });
+        });
+
+        // عرض النتائج المستحقة للشخص
+        for (let m in balances) {
+            if (balances[m] > 0) {
+                output.innerHTML += `<div class="list-item" style="border-right: 4px solid #2ecc71;"><span>${m}</span> <span style="color:#2ecc71;">gets back $${balances[m].toFixed(2)}</span></div>`;
+            } else if (balances[m] < 0) {
+                output.innerHTML += `<div class="list-item" style="border-right: 4px solid #e74c3c;"><span>${m}</span> <span style="color:#e74c3c;">owes $${Math.abs(balances[m]).toFixed(2)}</span></div>`;
+            } else {
+                output.innerHTML += `<div class="list-item"><span>${m}</span> <span>is all settled up</span></div>`;
+            }
+        }
+    }
+</script>
+
+</body>
+</html>

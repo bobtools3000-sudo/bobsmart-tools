@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRT Subtitle Time Shifter</title>
+    <style>
+        :root {
+            --primary: #e67e22;
+            --dark: #d35400;
+            --bg: #f5f6fa;
+            --text: #2c3e50;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 650px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        h1 { color: var(--dark); margin-bottom: 10px; }
+        .control-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+        input[type="number"], input[type="file"] {
+            padding: 10px;
+            border: 1px solid #dcdde1;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        input[type="number"] { width: 100px; }
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn:hover { background: var(--dark); }
+        .status {
+            margin-top: 15px;
+            font-weight: bold;
+            color: #27ae60;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>SRT Subtitle Shifter 🎬⏳</h1>
+    <p style="color: #7f8c8d;">Sync your subtitles easily! Shift times forward or backward in seconds.</p>
+    
+    <div style="margin: 25px 0;">
+        <input type="file" id="srt-file" accept=".srt" style="width: 100%; box-sizing: border-box;">
+    </div>
+
+    <div class="control-group">
+        <label for="shift-amount" style="font-weight: bold;">Shift Amount (seconds):</label>
+        <input type="number" id="shift-amount" value="0" step="0.1" placeholder="e.g. 1.5 or -2">
+    </div>
+
+    <button class="btn" onclick="processSRT()">Apply Shift & Download 🚀</button>
+    <div class="status" id="status-msg"></div>
+</div>
+
+<script>
+    function shiftTime(timeStr, secondsToShift) {
+        // صيغة الوقت في ملفات الـ SRT تكون: HH:MM:SS,mmm
+        let parts = timeStr.split(':');
+        let secsParts = parts[2].split(',');
+        
+        let hours = parseInt(parts[0], 10);
+        let minutes = parseInt(parts[1], 10);
+        let seconds = parseInt(secsParts[0], 10);
+        let ms = parseInt(secsParts[1], 10);
+
+        // تحويل الوقت بالكامل إلى ميلي ثانية لتسهيل الحساب
+        let totalMs = (hours * 3600 + minutes * 60 + seconds) * 1000 + ms;
+        totalMs += secondsToShift * 1000;
+
+        if (totalMs < 0) totalMs = 0; // منع الأوقات السالبة
+
+        // إعادة تحويل الميلي ثواني إلى صيغة SRT الأصلية
+        let newMs = totalMs % 1000;
+        let totalSecs = Math.floor(totalMs / 1000);
+        let newSecs = totalSecs % 60;
+        let totalMins = Math.floor(totalSecs / 60);
+        let newMins = totalMins % 60;
+        let newHours = Math.floor(totalMins / 60);
+
+        // تنسيق الأرقام لتأخذ خانتين أو 3 خانات للميلي ثانية
+        let pad = (num, size) => num.toString().padStart(size, '0');
+
+        return `${pad(newHours, 2)}:${pad(newMins, 2)}:${pad(newSecs, 2)},${pad(newMs, 3)}`;
+    }
+
+    function processSRT() {
+        const fileInput = document.getElementById('srt-file');
+        const shiftAmount = parseFloat(document.getElementById('shift-amount').value);
+        const statusMsg = document.getElementById('status-msg');
+
+        if (!fileInput.files[0]) {
+            return alert("Please select an .srt file first!");
+        }
+        if (isNaN(shiftAmount) || shiftAmount === 0) {
+            return alert("Please enter a non-zero shifting amount!");
+        }
+
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            const text = e.target.result;
+            // تعبير نمطي للبحث عن أسطر التوقيت في ملف الـ SRT
+            const timeRegex = /(\d{2}:\d{2}:\d{2},\d{3}) --> (\d{2}:\d{2}:\d{2},\d{3})/g;
+            
+            let updatedText = text.replace(timeRegex, function(match, startTime, endTime) {
+                return shiftTime(startTime, shiftAmount) + " --> " + shiftTime(endTime, shiftAmount);
+            });
+
+            // إنشاء ملف جديد للتحميل الفوري
+            const blob = new Blob([updatedText], { type: 'text/srt' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'shifted_' + file.name;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            statusMsg.innerText = "Subtitles shifted and downloaded successfully! ✅";
+        };
+
+        reader.readAsText(file);
+    }
+</script>
+
+</body>
+</html>

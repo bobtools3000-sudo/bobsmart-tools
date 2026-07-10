@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Minifier & Beautifier</title>
+    <style>
+        :root {
+            --primary-color: #9b59b6;
+            --secondary-color: #8e44ad;
+            --bg-color: #f5f6fa;
+            --card-bg: #ffffff;
+            --text-color: #2f3640;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        h1 {
+            color: var(--secondary-color);
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        p.desc {
+            text-align: center;
+            color: #718093;
+            margin-bottom: 25px;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 15px;
+            border: 1px solid #dcdde1;
+            border-radius: 8px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            box-sizing: border-box;
+            resize: vertical;
+            background-color: #f8f9fa;
+        }
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            color: white;
+        }
+        .btn-minify { background-color: #e74c3c; }
+        .btn-minify:hover { background-color: #c0392b; }
+        .btn-beautify { background-color: #2ecc71; }
+        .btn-beautify:hover { background-color: #27ae60; }
+        .btn-copy { background-color: #3498db; }
+        .btn-copy:hover { background-color: #2980b9; }
+        
+        .status-tag {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            background-color: #dcdde1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Code Minifier & Beautifier 💻✨</h1>
+    <p class="desc">An instant, client-side tool to minify your source code for speed, or beautify it for perfect readability.</p>
+    
+    <div>
+        <span class="status-tag" id="char-count">Character Count: 0</span>
+    </div>
+    
+    <textarea id="code-input" placeholder="Paste your HTML, CSS, or JavaScript code here..." oninput="updateCount()"></textarea>
+
+    <div class="btn-group">
+        <button class="btn btn-minify" onclick="minifyCode()">Minify Code ⚡</button>
+        <button class="btn btn-beautify" onclick="beautifyCode()">Beautify Code 🎨</button>
+    </div>
+
+    <h3 style="color: var(--secondary-color);">Result:</h3>
+    <textarea id="code-output" placeholder="The output will appear here..." readonly></textarea>
+
+    <div class="btn-group">
+        <button class="btn btn-copy" onclick="copyResult()">Copy Result 📋</button>
+        <button class="btn" style="background-color: #7f8c8d;" onclick="clearAll()">Clear All 🔄</button>
+    </div>
+</div>
+
+<script>
+    const codeInput = document.getElementById('code-input');
+    const codeOutput = document.getElementById('code-output');
+    const charCount = document.getElementById('char-count');
+
+    function updateCount() {
+        charCount.innerText = "Character Count: " + codeInput.value.length;
+    }
+
+    function minifyCode() {
+        let code = codeInput.value;
+        if(!code.trim()) return alert("Please enter some code first!");
+        
+        let minified = code
+            .replace(/\/\*[\s\S]*?\*\//g, '') 
+            .replace(/\/\/.*/g, '')           
+            .replace(/\s+/g, ' ')             
+            .replace(/\s*([\{\}\:\;\,\=\+\-\*\/])\s*/g, '$1') 
+            .trim();
+            
+        codeOutput.value = minified;
+    }
+
+    function beautifyCode() {
+        let code = codeInput.value;
+        if(!code.trim()) return alert("Please enter some code first!");
+        
+        let indent = 0;
+        let result = '';
+        let cleanCode = code.replace(/\s*([\{\}\;])\s*/g, '$1\n').replace(/\n+/g, '\n');
+        let lines = cleanCode.split('\n');
+
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i].trim();
+            if (!line) continue;
+
+            if (line.startsWith('}') || line.endsWith('}')) {
+                indent--;
+            }
+
+            result += '    '.repeat(Math.max(0, indent)) + line + '\n';
+
+            if (line.endsWith('{') || line.startsWith('{')) {
+                indent++;
+            }
+        }
+
+        codeOutput.value = result.trim();
+    }
+
+    function copyResult() {
+        if(!codeOutput.value.trim()) return;
+        navigator.clipboard.writeText(codeOutput.value).then(() => {
+            alert('Code copied to clipboard! ✅');
+        });
+    }
+
+    function clearAll() {
+        codeInput.value = '';
+        codeOutput.value = '';
+        updateCount();
+    }
+</script>
+
+</body>
+</html>

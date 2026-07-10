@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Pomodoro Timer</title>
+    <style>
+        :root {
+            --work-color: #e74c3c;
+            --break-color: #2ecc71;
+            --bg: #f5f6fa;
+            --text: #2c3e50;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            transition: background-color 0.5s ease;
+        }
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            background: #fff;
+            padding: 40px 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        h1 { margin-top: 0; color: #34495e; }
+        .timer-display {
+            font-size: 80px;
+            font-weight: bold;
+            margin: 20px 0;
+            font-family: monospace;
+            color: var(--work-color);
+        }
+        .status-label {
+            font-size: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            color: #7f8c8d;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .btn {
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+            color: white;
+            flex: 1;
+        }
+        .btn-start { background-color: #3498db; }
+        .btn-start:hover { background-color: #2980b9; }
+        .btn-pause { background-color: #f39c12; }
+        .btn-pause:hover { background-color: #d35400; }
+        .btn-reset { background-color: #95a5a6; }
+        .btn-reset:hover { background-color: #7f8c8d; }
+        
+        .mode-btn-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .mode-btn {
+            background: #eee;
+            color: #555;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            flex: 1;
+            transition: 0.2s;
+        }
+        .mode-btn.active {
+            background-color: var(--work-color);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Pomodoro Focus Timer 🍅⏱️</h1>
+    
+    <div class="mode-btn-group">
+        <button class="mode-btn active" id="work-mode-btn" onclick="setMode('work')">Focus Work (25m)</button>
+        <button class="mode-btn" id="break-mode-btn" onclick="setMode('break')">Short Break (5m)</button>
+    </div>
+
+    <div class="status-label" id="status-label">Time to Focus!</div>
+    <div class="timer-display" id="timer-display">25:00</div>
+
+    <div class="btn-group">
+        <button class="btn btn-start" id="start-btn" onclick="startTimer()">Start 🚀</button>
+        <button class="btn btn-pause" id="pause-btn" onclick="pauseTimer()" style="display:none;">Pause ⏸️</button>
+        <button class="btn btn-reset" onclick="resetTimer()">Reset 🔄</button>
+    </div>
+</div>
+
+<audio id="alarm-sound" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" preload="auto"></audio>
+
+<script>
+    let timer;
+    let timeLeft = 25 * 60; // 25 دقيقة بالثواني افتراضياً
+    let isRunning = false;
+    let currentMode = 'work'; // work أو break
+
+    const display = document.getElementById('timer-display');
+    const statusLabel = document.getElementById('status-label');
+    const startBtn = document.getElementById('start-btn');
+    const pauseBtn = document.getElementById('pause-btn');
+    const alarm = document.getElementById('alarm-sound');
+
+    function updateDisplay() {
+        let minutes = Math.floor(timeLeft / 60);
+        let seconds = timeLeft % 60;
+        let timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
+        display.innerText = timeString;
+        // تحديث عنوان التبويب في المتصفح ليراه المستخدم في أي مكان
+        document.title = `(${timeString}) Pomodoro Timer`;
+    }
+
+    function startTimer() {
+        if (isRunning) return;
+        isRunning = true;
+        startBtn.style.display = 'none';
+        pauseBtn.style.display = 'inline-block';
+
+        timer = setInterval(() => {
+            if (timeLeft > 0) {
+                timeLeft--;
+                updateDisplay();
+            } else {
+                clearInterval(timer);
+                isRunning = false;
+                alarm.play(); // تشغيل صوت التنبيه
+                alert(currentMode === 'work' ? "Great job! Time for a short break. 🎉" : "Break is over! Time to focus. 💪");
+                
+                // التبديل التلقائي للمود التالي
+                if (currentMode === 'work') {
+                    setMode('break');
+                } else {
+                    setMode('work');
+                }
+            }
+        }, 1000);
+    }
+
+    function pauseTimer() {
+        clearInterval(timer);
+        isRunning = false;
+        startBtn.style.display = 'inline-block';
+        pauseBtn.style.display = 'none';
+    }
+
+    function resetTimer() {
+        clearInterval(timer);
+        isRunning = false;
+        startBtn.style.display = 'inline-block';
+        pauseBtn.style.display = 'none';
+        timeLeft = currentMode === 'work' ? 25 * 60 : 5 * 60;
+        updateDisplay();
+    }
+
+    function setMode(mode) {
+        currentMode = mode;
+        clearInterval(timer);
+        isRunning = false;
+        startBtn.style.display = 'inline-block';
+        pauseBtn.style.display = 'none';
+
+        const workBtn = document.getElementById('work-mode-btn');
+        const breakBtn = document.getElementById('break-mode-btn');
+
+        if (mode === 'work') {
+            timeLeft = 25 * 60;
+            statusLabel.innerText = "Time to Focus!";
+            display.style.color = "var(--work-color)";
+            workBtn.classList.add('active');
+            workBtn.style.backgroundColor = "var(--work-color)";
+            breakBtn.classList.remove('active');
+            breakBtn.style.backgroundColor = "#eee";
+        } else {
+            timeLeft = 5 * 60;
+            statusLabel.innerText = "Take a Break!";
+            display.style.color = "var(--break-color)";
+            breakBtn.classList.add('active');
+            breakBtn.style.backgroundColor = "var(--break-color)";
+            workBtn.classList.remove('active');
+            workBtn.style.backgroundColor = "#eee";
+        }
+        updateDisplay();
+    }
+
+    // تشغيل العرض الأولي
+    updateDisplay();
+</script>
+
+</body>
+</html>

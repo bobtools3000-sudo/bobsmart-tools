@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shorts & TikTok Tag Generator</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f4f7f6; padding: 40px; color: #333; text-align: center; }
+        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 550px; margin: auto; }
+        h2 { color: #2c3e50; }
+        input { width: 85%; padding: 12px; margin: 15px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
+        button { padding: 12px 25px; background: #e74c3c; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; width: 90%; margin-bottom: 15px; }
+        button:hover { background: #c0392b; }
+        .results-box { margin-top: 20px; text-align: left; background: #fafafa; padding: 15px; border-radius: 8px; border: 1px dashed #ccc; display: none; }
+        .tag { display: inline-block; background: #edf2f7; color: #4a5568; padding: 5px 10px; border-radius: 20px; margin: 5px; font-size: 14px; font-weight: 500; }
+        .points-badge { display: inline-block; background: #f1c40f; color: #2c3e50; padding: 5px 15px; border-radius: 20px; font-weight: bold; margin-top: 15px; }
+        .copy-btn { background: #2ecc71; width: auto; padding: 5px 15px; font-size: 12px; display: block; margin-top: 10px; }
+        .copy-btn:hover { background: #27ae60; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Shorts & TikTok Tag Generator</h2>
+        <p>Enter your video topic to generate viral tags and hashtags</p>
+        <input type="text" id="topicInput" placeholder="e.g., cooking tips, gaming, tech review...">
+        <br>
+        <button onclick="generateTags()">Generate Viral Tags</button>
+        
+        <div class="results-box" id="resultsBox">
+            <strong>🎯 Generated Tags:</strong>
+            <div id="tagsContainer"></div>
+            <button class="copy-btn" onclick="copyAllTags()">Copy All Tags</button>
+        </div>
+
+        <div class="points-badge" id="pointsDisplay">⭐ Total Points: 0 XP</div>
+    </div>
+
+    <script>
+        let points = parseInt(localStorage.getItem('userPoints')) || 0;
+        document.getElementById('pointsDisplay').innerText = `⭐ Total Points: ${points} XP`;
+
+        function generateTags() {
+            const topic = document.getElementById("topicInput").value.trim();
+            if (topic === "") {
+                alert("Please enter a video topic first!");
+                return;
+            }
+
+            const baseTags = ['viral', 'trending', 'foryou', 'fyp', 'shorts', 'tiktok'];
+            const topicCleaned = topic.toLowerCase().replace(/\s+/g, '');
+            
+            const generated = [
+                `#${topicCleaned}`, 
+                `#${topicCleaned}tips`, 
+                `#${topicCleaned}viral`, 
+                `#trending${topicCleaned}`,
+                ...baseTags.map(t => `#${t}`),
+                ...baseTags.map(t => `#${topicCleaned}${t}`)
+            ];
+
+            const container = document.getElementById("tagsContainer");
+            container.innerHTML = "";
+            generated.forEach(tag => {
+                const span = document.createElement("span");
+                span.className = "tag";
+                span.innerText = tag;
+                container.appendChild(span);
+            });
+
+            document.getElementById("resultsBox").style.display = "block";
+
+            // إضافة النقاط بـ الـ Gamification
+            points += 20;
+            localStorage.setItem('userPoints', points);
+            document.getElementById('pointsDisplay').innerText = `⭐ Total Points: ${points} XP`;
+        }
+
+        function copyAllTags() {
+            const tags = Array.from(document.querySelectorAll('.tag')).map(t => t.innerText).join(' ');
+            navigator.clipboard.writeText(tags);
+            alert("All tags copied to clipboard! Go ahead and paste them in your video description.");
+        }
+    </script>
+</body>
+</html>
