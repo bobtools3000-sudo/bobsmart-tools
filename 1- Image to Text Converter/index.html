@@ -1,187 +1,106 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Image to Text Converter</title>
     <style>
-        :root {
-            --primary-color: #3498db;
-            --secondary-color: #2980b9;
-            --bg-color: #f5f6fa;
-            --card-bg: #ffffff;
-            --text-color: #2f3640;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-        h1 {
-            color: var(--secondary-color);
-            text-align: center;
-            margin-bottom: 10px;
-        }
-        p.desc {
-            text-align: center;
-            color: #718093;
-            margin-bottom: 25px;
-        }
-        .upload-area {
-            border: 2px dashed var(--primary-color);
-            background-color: #f8f9fa;
-            padding: 40px;
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-bottom: 20px;
-        }
-        .upload-area:hover {
-            background-color: #e8f4fd;
-        }
-        .upload-area img {
-            width: 50px;
-            margin-bottom: 10px;
-        }
-        #image-input { display: none; }
-        
-        .progress-container {
-            display: none;
-            margin: 20px 0;
-        }
-        .progress-bar {
-            width: 100%;
-            background-color: #dcdde1;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .progress-fill {
-            height: 10px;
-            width: 0%;
-            background-color: var(--primary-color);
-            transition: width 0.2s;
-        }
-        .status-text {
-            font-size: 14px;
-            color: #718093;
-            margin-top: 5px;
-            text-align: center;
-        }
-
-        textarea {
-            width: 100%;
-            height: 150px;
-            padding: 12px;
-            border: 1px solid #dcdde1;
-            border-radius: 6px;
-            font-size: 15px;
-            box-sizing: border-box;
-            resize: vertical;
-        }
-        .btn-copy {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: 0.3s;
-        }
-        .btn-copy:hover {
-            background-color: var(--secondary-color);
-        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; padding: 20px; color: #333; text-align: center; margin: 0; }
+        .container { max-width: 650px; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin: 40px auto; }
+        h2 { color: #2c3e50; margin-bottom: 5px; font-size: 28px; }
+        p.subtitle { color: #7f8c8d; margin-bottom: 25px; font-size: 14px; }
+        .upload-box { border: 2px dashed #3498db; padding: 40px 20px; border-radius: 10px; background: #f9fbfd; cursor: pointer; margin-bottom: 20px; transition: all 0.3s ease; position: relative; }
+        .upload-box:hover { background: #f0f4f8; border-color: #2980b9; }
+        .upload-icon { font-size: 40px; margin-bottom: 10px; display: block; }
+        #imagePreview { max-width: 100%; max-height: 200px; display: none; margin-top: 15px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        textarea { width: 100%; height: 160px; margin-top: 20px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; resize: vertical; font-size: 15px; background: #fafafa; }
+        .btn { display: inline-block; padding: 12px 24px; background: #3498db; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; margin: 15px 5px 0 5px; border: none; cursor: pointer; font-size: 15px; transition: background 0.2s; }
+        .btn:hover { background: #2980b9; }
+        .btn-back { background: #95a5a6; }
+        .btn-back:hover { background: #7f8c8d; }
+        .status { margin-top: 15px; font-weight: bold; color: #e67e22; font-size: 15px; }
+        .progress-bar { width: 0%; height: 6px; background: #2ecc71; position: absolute; bottom: 0; left: 0; border-radius: 0 0 0 10px; transition: width 0.2s; }
     </style>
-    <!-- مكتبة Tesseract الذكية لقراءة النصوص -->
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <!-- استدعاء المكتبة من سيرفر CDN عالمي ومستقر يدعم التشغيل أونلاين -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js"></script>
 </head>
 <body>
 
 <div class="container">
-    <h1>AI Image to Text Converter 🔍✨</h1>
-    <p class="desc">Extract text from any image instantly. Supports multiple languages with 100% privacy.</p>
+    <h2>AI Image to Text Converter 🔍 ✨</h2>
+    <p class="subtitle">Extract text from any image instantly. Supports multiple languages with 100% privacy.</p>
     
-    <div class="upload-area" onclick="document.getElementById('image-input').click()">
-        <span style="font-size: 40px;">📂</span>
-        <p style="font-weight: bold; margin: 10px 0 0 0;">Click to upload an image or drag & drop it here</p>
-        <input type="file" id="image-input" accept="image/*">
+    <div class="upload-box" onclick="document.getElementById('fileInput').click()">
+        <span class="upload-icon">📁</span>
+        <p id="uploadText">Click to upload an image or drag & drop it here</p>
+        <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="processImage(this)">
+        <img id="imagePreview" alt="Preview">
+        <div id="progressBar" class="progress-bar"></div>
     </div>
 
-    <div class="progress-container" id="progress-container">
-        <div class="progress-bar">
-            <div class="progress-fill" id="progress-fill"></div>
-        </div>
-        <div class="status-text" id="status-text">Idle - Waiting for image...</div>
-    </div>
+    <div id="statusText" class="status"></div>
 
-    <textarea id="output-text" placeholder="The extracted text will appear here..." readonly></textarea>
-    <button class="btn-copy" onclick="copyText()">Copy Extracted Text 📋</button>
+    <textarea id="outputBox" readonly placeholder="Extracted text will appear here..."></textarea>
+
+    <button onclick="copyText()" class="btn">Copy Extracted Text 📋</button>
+    <br>
+    <a href="../index.html" class="btn btn-back">Return to Main Hub</a>
 </div>
 
 <script>
-    const imageInput = document.getElementById('image-input');
-    const progressContainer = document.getElementById('progress-container');
-    const progressFill = document.getElementById('progress-fill');
-    const statusText = document.getElementById('status-text');
-    const outputText = document.getElementById('output-text');
-
-    imageInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
+    function processImage(input) {
+        const file = input.files[0];
         if (!file) return;
 
-        progressContainer.style.display = 'block';
-        outputText.value = '';
-        recognizeText(file);
-    });
+        // عرض الصورة المرفوعة فوراً للمستخدم
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById('imagePreview');
+            const uploadText = document.getElementById('uploadText');
+            preview.src = e.target.result;
+            preview.style.display = 'inline-block';
+            uploadText.style.display = 'none';
+        }
+        reader.readAsDataURL(file);
 
-    function recognizeText(file) {
+        const status = document.getElementById('statusText');
+        const output = document.getElementById('outputBox');
+        const pBar = document.getElementById('progressBar');
+        
+        status.innerText = "🌀 Initializing AI Engine...";
+        output.value = "";
+        pBar.style.width = "5%";
+
+        // تشغيل محرك التعرف على النصوص الاحترافي
         Tesseract.recognize(
             file,
-            'eng', // يدعم الإنجليزية افتراضياً، يمكنك التغيير لـ ara إذا أردت
-            {
+            'eng',
+            { 
                 logger: m => {
-                    if (m.status === 'recognizing text') {
-                        statusText.innerText = `Extracting text... ${(m.progress * 100).toFixed(0)}%`;
-                        progressFill.style.width = `${m.progress * 100}%`;
-                    } else {
-                        statusText.innerText = m.status;
+                    if(m.status === 'recognizing') {
+                        const progress = Math.round(m.progress * 100);
+                        status.innerText = `⏳ Extracting Text: ${progress}%`;
+                        pBar.style.width = `${progress}%`;
                     }
-                }
+                } 
             }
         ).then(({ data: { text } }) => {
-            statusText.innerText = "Text extracted successfully! ✅";
-            progressContainer.style.display = 'none';
-            if(text.trim() === "") {
-                outputText.value = "No text found in this image.";
-            } else {
-                outputText.value = text;
-            }
+            status.innerText = "✅ Success! Text Extracted.";
+            pBar.style.width = "100%";
+            output.value = text.trim() ? text.trim() : "No clear text found. Please upload a clear screenshot containing English text.";
         }).catch(err => {
             console.error(err);
-            statusText.innerText = "Error extracting text. Please try again.";
+            status.innerText = "❌ Connection error or unsupported image format.";
+            output.value = "Please refresh the page and try again with a standard PNG or JPG screenshot.";
         });
     }
 
     function copyText() {
-        if(!outputText.value.trim()) return;
-        navigator.clipboard.writeText(outputText.value).then(() => {
-            alert('Text copied to clipboard! ✅');
-        });
+        const textBox = document.getElementById('outputBox');
+        if(!textBox.value) return;
+        textBox.select();
+        document.execCommand('copy');
+        alert('Text copied successfully!');
     }
 </script>
 
