@@ -1,212 +1,249 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Freelance Contract & NDA Builder</title>
+    <title>Professional Contract & NDA Builder</title>
     <style>
-        :root {
-            --primary-color: #2c3e50;
-            --accent-color: #16a085;
-            --bg-color: #ecf0f1;
-            --card-bg: #ffffff;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: var(--primary-color);
-            text-align: center;
-            margin-bottom: 25px;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 15px;
-        }
-        label {
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #34495e;
-        }
-        input, select, textarea {
-            padding: 10px;
-            border: 1px solid #bdc3c7;
-            border-radius: 6px;
-            font-size: 14px;
-        }
-        .contract-preview {
-            margin-top: 30px;
-            padding: 25px;
-            border: 2px solid #34495e;
-            background: #fff;
-            min-height: 300px;
-            font-size: 16px;
-            line-height: 1.8;
-            white-space: pre-line;
-        }
-        .btn-group {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        .btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-        .btn-primary { background-color: var(--accent-color); color: white; }
-        .btn-primary:hover { background-color: #11806a; }
-        .btn-secondary { background-color: var(--primary-color); color: white; }
-        .btn-secondary:hover { background-color: #1a252f; }
-        @media print {
-            body * { visibility: hidden; }
-            .contract-preview, .contract-preview * { visibility: visible; }
-            .contract-preview { position: absolute; left: 0; top: 0; width: 100%; border: none; }
-        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; padding: 20px; color: #333; margin: 0; }
+        .container { max-width: 800px; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin: 30px auto; }
+        h2 { color: #2c3e50; text-align: center; margin-bottom: 5px; font-size: 28px; }
+        p.subtitle { color: #7f8c8d; text-align: center; margin-bottom: 25px; font-size: 14px; }
+        .form-section { background: #fcfcfc; border: 1px solid #eaeaea; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .form-section h4 { margin-top: 0; color: #2980b9; font-size: 16px; border-bottom: 2px solid #edf2f7; padding-bottom: 5px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-group { margin-bottom: 15px; text-align: left; }
+        label { font-weight: bold; color: #34495e; display: block; margin-bottom: 5px; font-size: 13px; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 14px; background: #fafafa; }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .btn { padding: 12px; background: #3498db; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; text-align: center; transition: background 0.2s; text-decoration: none; }
+        .btn:hover { background: #2980b9; }
+        .btn-success { background: #2ecc71; }
+        .btn-success:hover { background: #27ae60; }
+        .btn-secondary { background: #95a5a6; grid-column: span 2; margin-top: 10px; }
+        .btn-secondary:hover { background: #7f8c8d; }
+        .output-box { margin-top: 25px; display: none; text-align: left; }
+        .contract-preview { background: #fff; border: 1px solid #ccc; padding: 25px; border-radius: 8px; font-family: 'Courier New', Courier, monospace; white-space: pre-line; max-height: 500px; overflow-y: auto; font-size: 14px; line-height: 1.6; color: #2c3e50; box-shadow: inset 0 0 10px rgba(0,0,0,0.05); }
+        .actions { display: flex; gap: 10px; margin-top: 15px; }
+        .actions .btn { flex: 1; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Professional Contract & NDA Builder 📄✨</h1>
-    
-    <div class="grid">
+    <h2>Professional Contract & NDA Builder 📜 ⚖️</h2>
+    <p class="subtitle">Generate professional, legally-sound contracts and NDAs with full legal identity fields.</p>
+
+    <!-- نوع المستند والتاريخ -->
+    <div class="grid-2">
         <div class="form-group">
-            <label>Document Type</label>
-            <select id="doc-type" onchange="generateContract()">
-                <option value="freelance">Freelance Contract</option>
+            <label for="docType">Document Type:</label>
+            <select id="docType" onchange="toggleFields()">
+                <option value="contract">Freelance Work Contract</option>
                 <option value="nda">Non-Disclosure Agreement (NDA)</option>
             </select>
         </div>
         <div class="form-group">
-            <label>Agreement Date</label>
-            <input type="date" id="doc-date" oninput="generateContract()">
-        </div>
-        <div class="form-group">
-            <label>Party Information (First Party - Freelancer/Provider)</label>
-            <input type="text" id="party-one" placeholder="Full Name or Company" oninput="generateContract()">
-        </div>
-        <div class="form-group">
-            <label>Party Information (Second Party - Client)</label>
-            <input type="text" id="party-two" placeholder="Full Name or Client Name" oninput="generateContract()">
-        </div>
-        <div class="form-group">
-            <label>Project Title / Scope of Work</label>
-            <input type="text" id="project-title" placeholder="e.g., E-commerce Website Development" oninput="generateContract()">
-        </div>
-        <div class="form-group">
-            <label>Contract Value / Payment Terms</label>
-            <input type="text" id="contract-value" placeholder="e.g., $1,500 USD total" oninput="generateContract()">
+            <label for="effectiveDate">Effective Date:</label>
+            <input type="date" id="effectiveDate">
         </div>
     </div>
 
-    <div class="form-group" style="margin-top: 15px;">
-        <label>Custom Clauses / Additional Terms</label>
-        <textarea id="custom-terms" rows="3" placeholder="Type any additional custom terms here..." oninput="generateContract()"></textarea>
+    <!-- بيانات الطرف الأول -->
+    <div class="form-section">
+        <h4 id="partyALabel">First Party (Client / Disclosing Party)</h4>
+        <div class="form-group">
+            <label for="partyAName">Full Name / Company Name:</label>
+            <input type="text" id="partyAName" placeholder="e.g. Acme Corp or Ahmed Ali">
+        </div>
+        <div class="grid-2">
+            <div class="form-group">
+                <label for="partyAID">National ID / Passport / CR Number:</label>
+                <input type="text" id="partyAID" placeholder="e.g. 2950101XXXXXXX / CR-5543">
+            </div>
+            <div class="form-group">
+                <label for="partyAAddress">Official Address:</label>
+                <input type="text" id="partyAAddress" placeholder="e.g. 123 Nile St, Cairo, Egypt">
+            </div>
+        </div>
     </div>
 
-    <h3 style="margin-top: 30px; color: var(--primary-color);">Live Document Preview:</h3>
-    <div class="contract-preview" id="contract-output">
-        Please fill in the information above to generate the contract...
+    <!-- بيانات الطرف الثاني -->
+    <div class="form-section">
+        <h4 id="partyBLabel">Second Party (Freelancer / Receiving Party)</h4>
+        <div class="form-group">
+            <label for="partyBName">Full Name:</label>
+            <input type="text" id="partyBName" placeholder="e.g. John Doe">
+        </div>
+        <div class="grid-2">
+            <div class="form-group">
+                <label for="partyBID">National ID / Passport Number:</label>
+                <input type="text" id="partyBID" placeholder="e.g. 2990505XXXXXXX">
+            </div>
+            <div class="form-group">
+                <label for="partyBAddress">Official Address:</label>
+                <input type="text" id="partyBAddress" placeholder="e.g. 45 Freedom Sq, Giza, Egypt">
+            </div>
+        </div>
+    </div>
+
+    <!-- بيانات العقد المتغيرة -->
+    <div id="contractFields" class="form-section">
+        <h4>Project & Payment Details</h4>
+        <div class="form-group">
+            <label for="projectScope">Project Scope / Services Provided:</label>
+            <input type="text" id="projectScope" placeholder="e.g. Web Development and UI/UX Design">
+        </div>
+        <div class="form-group">
+            <label for="paymentAmount">Payment / Budget (USD):</label>
+            <input type="number" id="paymentAmount" placeholder="e.g. 1500">
+        </div>
     </div>
 
     <div class="btn-group">
-        <button class="btn btn-primary" onclick="window.print()">Print or Save as PDF 🖨️</button>
-        <button class="btn btn-secondary" onclick="copyContract()">Copy Text 📋</button>
+        <button onclick="generateDocument()" class="btn btn-success" style="grid-column: span 2;">Generate Document ✨</button>
+        <a href="../index.html" class="btn btn-secondary">Return to Main Hub</a>
+    </div>
+
+    <div id="outputArea" class="output-box">
+        <h3 style="color:#2c3e50; text-align: left; margin-bottom: 10px;">📄 Preview Document:</h3>
+        <div id="contractPreview" class="contract-preview"></div>
+        <div class="actions">
+            <button onclick="copyContract()" class="btn">Copy Text 📋</button>
+            <button onclick="printContract()" class="btn btn-success">Print / Save as PDF 🖨️</button>
+        </div>
     </div>
 </div>
 
 <script>
-    document.getElementById('doc-date').valueAsDate = new Date();
+    document.getElementById('effectiveDate').valueAsDate = new Date();
 
-    function generateContract() {
-        const docType = document.getElementById('doc-type').value;
-        const docDate = document.getElementById('doc-date').value;
-        const partyOne = document.getElementById('party-one').value || '[First Party Name]';
-        const partyTwo = document.getElementById('party-two').value || '[Second Party Name]';
-        const projectTitle = document.getElementById('project-title').value || '[Project Title]';
-        const contractValue = document.getElementById('contract-value').value || '[Contract Value]';
-        const customTerms = document.getElementById('custom-terms').value;
+    function toggleFields() {
+        const docType = document.getElementById('docType').value;
+        const contractFields = document.getElementById('contractFields');
+        const partyALabel = document.getElementById('partyALabel');
+        const partyBLabel = document.getElementById('partyBLabel');
 
-        let contractText = "";
-
-        if (docType === "freelance") {
-            contractText = `FREELANCE SERVICES AGREEMENT
-
-This Agreement is entered into on ${docDate}, by and between:
-First Party (Service Provider): ${partyOne}
-Second Party (Client): ${partyTwo}
-
-Both parties agree to the following legally binding terms and conditions:
-
-1. Scope of Work:
-The First Party agrees to perform and deliver the project titled: (${projectTitle}) for the Second Party according to the agreed specifications.
-
-2. Compensation & Payment:
-The Second Party agrees to pay a total amount of (${contractValue}) to the First Party, payable upon milestone completions as agreed.
-
-3. Intellectual Property:
-All intellectual property and code ownership rights of the project shall be transferred to the Second Party immediately upon receipt of full payment.
-
-4. Additional Terms:
-${customTerms ? customTerms : "No additional terms specified."}
-
-First Party Signature: ............................                     Second Party Signature: ............................`;
+        if (docType === 'nda') {
+            contractFields.style.display = 'none';
+            partyALabel.innerText = "First Party (Disclosing Party)";
+            partyBLabel.innerText = "Second Party (Receiving Party)";
         } else {
-            contractText = `NON-DISCLOSURE AGREEMENT (NDA)
+            contractFields.style.display = 'block';
+            partyALabel.innerText = "First Party (Client)";
+            partyBLabel.innerText = "Second Party (Freelancer)";
+        }
+    }
 
-This Non-Disclosure Agreement is made on ${docDate}, by and between:
-First Party (Disclosing Party): ${partyOne}
-Second Party (Receiving Party): ${partyTwo}
+    function generateDocument() {
+        const docType = document.getElementById('docType').value;
+        const date = document.getElementById('effectiveDate').value || "[Date]";
+        
+        // جلب بيانات الطرف الأول
+        const pAName = document.getElementById('partyAName').value.trim() || "[Client/Company Name]";
+        const pAID = document.getElementById('partyAID').value.trim() || "[ID/Passport/CR Number]";
+        const pAAddr = document.getElementById('partyAAddress').value.trim() || "[Official Address]";
 
-Terms and Conditions:
+        // جلب بيانات الطرف الثاني
+        const pBName = document.getElementById('partyBName').value.trim() || "[Freelancer Name]";
+        const pBID = document.getElementById('partyBID').value.trim() || "[ID/Passport Number]";
+        const pBAddr = document.getElementById('partyBAddress').value.trim() || "[Official Address]";
+        
+        let template = "";
 
-1. Confidential Information:
-"Confidential Information" refers to any data, source code, designs, business plans, and documentation shared regarding the project: (${projectTitle}).
-
-2. Obligations of Confidentiality:
-The Receiving Party agrees to maintain absolute confidentiality and shall not disclose, publish, or leak any information to a third party without prior written consent.
-
-3. Additional Terms:
-${customTerms ? customTerms : "No additional terms specified."}
-
-First Party Signature: ............................                     Second Party Signature: ............................`;
+        if (docType === 'contract') {
+            const scope = document.getElementById('projectScope').value.trim() || "[Project Scope]";
+            const payment = document.getElementById('paymentAmount').value.trim() || "[Amount]";
+            
+            template = `SERVICES AGREEMENT
+            
+            This Services Agreement (the "Agreement") is entered into as of ${date} (the "Effective Date"), by and between:
+            
+            FIRST PARTY (THE CLIENT):
+            Name/Company: ${pAName}
+            ID / Passport / Registration No.: ${pAID}
+            Official Address: ${pAAddr}
+            
+            SECOND PARTY (THE FREELANCER):
+            Name: ${pBName}
+            National ID / Passport No.: ${pBID}
+            Official Address: ${pBAddr}
+            
+            1. SERVICES AND SCOPE:
+            The Freelancer agrees to perform the following professional services for the Client: 
+            ${scope}
+            
+            2. COMPENSATION:
+            As full compensation for the services rendered, the Client agrees to pay the Freelancer a total sum of $${payment} USD. Payment shall be made upon completion of the deliverables unless otherwise agreed.
+            
+            3. IDENTITY & LEGALITY:
+            Both parties declare under their own legal responsibility that the identity data, registration numbers, and addresses provided in this document are true, official, and legally binding.
+            
+            4. OWNERSHIP OF WORK PRODUCT:
+            Upon full payment, all rights, titles, and interests in the work product generated by the Freelancer under this agreement shall be transferred entirely to the Client.
+            
+            5. TERMINATION:
+            Either party may terminate this Agreement at any time with a 7-day written notice to the other party.
+            
+            IN WITNESS WHEREOF, the parties hereto have executed this Agreement as of the Effective Date written above.
+            
+            Client Signature: __________________     Freelancer Signature: __________________`;
+        } else {
+            template = `NON-DISCLOSURE AGREEMENT (NDA)
+            
+            This Non-Disclosure Agreement (the "Agreement") is entered into as of ${date} (the "Effective Date"), by and between:
+            
+            DISCLOSING PARTY:
+            Name/Company: ${pAName}
+            ID / Passport / Registration No.: ${pAID}
+            Official Address: ${pAAddr}
+            
+            RECEIVING PARTY:
+            Name: ${pBName}
+            National ID / Passport No.: ${pBID}
+            Official Address: ${pBAddr}
+            
+            1. CONFIDENTIAL INFORMATION:
+            For purposes of this Agreement, "Confidential Information" shall include all information, trade secrets, software code, designs, or material that has or could have commercial value or other utility in the business in which Disclosing Party is engaged.
+            
+            2. OBLIGATIONS OF RECEIVING PARTY:
+            The Receiving Party shall hold and maintain the Confidential Information in strictest confidence for the sole and exclusive benefit of the Disclosing Party. The Receiving Party shall not, without prior written approval of Disclosing Party, disclose or use for personal benefit any Confidential Information.
+            
+            3. IDENTITY & VALIDITY:
+            Both parties declare that the official identity numbers and addresses written above are correct and represent their legal persons for any future notices or judicial proceedings.
+            
+            4. TERM:
+            The non-disclosure provisions of this Agreement shall survive the termination of this Agreement and Receiving Party's duty to hold Confidential Information in confidence shall remain in effect indefinitely or until such information no longer qualifies as a trade secret.
+            
+            IN WITNESS WHEREOF, the parties hereto have executed this Agreement as of the Effective Date written above.
+            
+            Disclosing Party: __________________     Receiving Party: __________________`;
         }
 
-        document.getElementById('contract-output').innerText = contractText;
+        document.getElementById('contractPreview').innerText = template;
+        document.getElementById('outputArea').style.display = 'block';
+        document.getElementById('outputArea').scrollIntoView({ behavior: 'smooth' });
     }
 
     function copyContract() {
-        const text = document.getElementById('contract-output').innerText;
-        navigator.clipboard.writeText(text).then(() => {
-            alert('Contract copied to clipboard! ✅');
+        const content = document.getElementById('contractPreview').innerText;
+        if(!content) return;
+        navigator.clipboard.writeText(content).then(() => {
+            alert('Document text copied successfully!');
         });
     }
 
-    generateContract();
+    function printContract() {
+        const content = document.getElementById('contractPreview').innerText;
+        if(!content) return;
+        
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write('<html><head><title>Print Document</title><style>body{font-family:monospace; padding:40px; line-height:1.6; white-space: pre-line;}</style></head><body>');
+        printWindow.document.write(content);
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+        printWindow.print();
+    }
 </script>
 
 </body>
