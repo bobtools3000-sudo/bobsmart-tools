@@ -1,175 +1,159 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Code Minifier & Beautifier</title>
+    <title>Advanced Code & Prompt Processor</title>
     <style>
-        :root {
-            --primary-color: #9b59b6;
-            --secondary-color: #8e44ad;
-            --bg-color: #f5f6fa;
-            --card-bg: #ffffff;
-            --text-color: #2f3640;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-        h1 {
-            color: var(--secondary-color);
-            text-align: center;
-            margin-bottom: 10px;
-        }
-        p.desc {
-            text-align: center;
-            color: #718093;
-            margin-bottom: 25px;
-        }
-        textarea {
-            width: 100%;
-            height: 200px;
-            padding: 15px;
-            border: 1px solid #dcdde1;
-            border-radius: 8px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 14px;
-            box-sizing: border-box;
-            resize: vertical;
-            background-color: #f8f9fa;
-        }
-        .btn-group {
-            display: flex;
-            gap: 15px;
-            margin: 20px 0;
-        }
-        .btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
-            color: white;
-        }
-        .btn-minify { background-color: #e74c3c; }
-        .btn-minify:hover { background-color: #c0392b; }
-        .btn-beautify { background-color: #2ecc71; }
-        .btn-beautify:hover { background-color: #27ae60; }
-        .btn-copy { background-color: #3498db; }
-        .btn-copy:hover { background-color: #2980b9; }
-        
-        .status-tag {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            background-color: #dcdde1;
-        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; padding: 40px 20px; color: #334155; margin: 0; }
+        .container { max-width: 900px; background: white; padding: 40px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin: 0 auto; text-align: left; }
+        h2 { color: #1e293b; margin-top: 0; margin-bottom: 5px; font-size: 28px; font-weight: 700; }
+        p.subtitle { color: #64748b; margin-bottom: 30px; font-size: 15px; margin-top: 0; }
+        .form-group { margin-bottom: 20px; }
+        label { font-weight: 600; color: #475569; display: block; margin-bottom: 8px; font-size: 14px; }
+        textarea { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 10px; box-sizing: border-box; font-size: 14px; font-family: 'Courier New', Courier, monospace; background: #ffffff; color: #1e293b; resize: vertical; }
+        textarea:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 12px; margin-bottom: 25px; }
+        .btn { padding: 14px; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; text-align: center; transition: all 0.2s; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-minify { background-color: #ef4444; }
+        .btn-minify:hover { background-color: #dc2626; }
+        .btn-beautify { background-color: #10b981; }
+        .btn-beautify:hover { background-color: #059669; }
+        .btn-ai { background-color: #6366f1; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.2); }
+        .btn-ai:hover { background-color: #4f46e5; transform: translateY(-1px); }
+        .btn-secondary { background: #64748b; grid-column: span 3; margin-top: 10px; }
+        .btn-secondary:hover { background: #475569; }
+        .output-box { margin-top: 25px; display: none; }
+        .output-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .output-title { font-size: 16px; font-weight: 700; color: #1e293b; }
+        .btn-copy { background: #e2e8f0; color: #475569; padding: 6px 12px; font-size: 12px; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; }
+        .btn-copy:hover { background: #cbd5e1; }
+        .result-preview { background: #0f172a; color: #e2e8f0; padding: 25px; border-radius: 10px; font-family: 'Courier New', Courier, monospace; white-space: pre-wrap; max-height: 450px; overflow-y: auto; font-size: 14px; line-height: 1.6; border-left: 4px solid #6366f1; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Code Minifier & Beautifier 💻✨</h1>
-    <p class="desc">An instant, client-side tool to minify your source code for speed, or beautify it for perfect readability.</p>
-    
-    <div>
-        <span class="status-tag" id="char-count">Character Count: 0</span>
-    </div>
-    
-    <textarea id="code-input" placeholder="Paste your HTML, CSS, or JavaScript code here..." oninput="updateCount()"></textarea>
+    <h2>Code Minifier & AI Prompt Optimizer 💻 ✨</h2>
+    <p class="subtitle">Minify/Beautify source code or optimize raw prompts into highly structured inputs for Cursor, Replit Agents & v0.</p>
 
-    <div class="btn-group">
-        <button class="btn btn-minify" onclick="minifyCode()">Minify Code ⚡</button>
-        <button class="btn btn-beautify" onclick="beautifyCode()">Beautify Code 🎨</button>
+    <div class="form-group">
+        <label for="inputText">Enter Source Code or Raw Prompt:</label>
+        <textarea id="inputText" rows="10" placeholder="Paste your HTML/CSS/JS code OR type your raw AI instructions here (e.g., 'make me a weather landing page with charts')..."></textarea>
     </div>
 
-    <h3 style="color: var(--secondary-color);">Result:</h3>
-    <textarea id="code-output" placeholder="The output will appear here..." readonly></textarea>
-
     <div class="btn-group">
-        <button class="btn btn-copy" onclick="copyResult()">Copy Result 📋</button>
-        <button class="btn" style="background-color: #7f8c8d;" onclick="clearAll()">Clear All 🔄</button>
+        <button onclick="processCode('minify')" class="btn btn-minify">Minify Code ⚡</button>
+        <button onclick="processCode('beautify')" class="btn btn-beautify">Beautify Code 🎨</button>
+        <button onclick="optimizePrompt()" class="btn btn-ai">Optimize for AI Agents 🚀</button>
+        <a href="../index.html" class="btn btn-secondary">Return to Main Hub</a>
+    </div>
+
+    <div id="outputArea" class="output-box">
+        <div class="output-header">
+            <div id="resultTitle" class="output-title">Processed Output:</div>
+            <button onclick="copyOutput()" class="btn-copy">Copy Result 📋</button>
+        </div>
+        <div id="resultPreview" class="result-preview"></div>
     </div>
 </div>
 
 <script>
-    const codeInput = document.getElementById('code-input');
-    const codeOutput = document.getElementById('code-output');
-    const charCount = document.getElementById('char-count');
+    function processCode(action) {
+        const input = document.getElementById('inputText').value.trim();
+        const resultPreview = document.getElementById('resultPreview');
+        const outputArea = document.getElementById('outputArea');
+        const resultTitle = document.getElementById('resultTitle');
 
-    function updateCount() {
-        charCount.innerText = "Character Count: " + codeInput.value.length;
-    }
-
-    function minifyCode() {
-        let code = codeInput.value;
-        if(!code.trim()) return alert("Please enter some code first!");
-        
-        let minified = code
-            .replace(/\/\*[\s\S]*?\*\//g, '') 
-            .replace(/\/\/.*/g, '')           
-            .replace(/\s+/g, ' ')             
-            .replace(/\s*([\{\}\:\;\,\=\+\-\*\/])\s*/g, '$1') 
-            .trim();
-            
-        codeOutput.value = minified;
-    }
-
-    function beautifyCode() {
-        let code = codeInput.value;
-        if(!code.trim()) return alert("Please enter some code first!");
-        
-        let indent = 0;
-        let result = '';
-        let cleanCode = code.replace(/\s*([\{\}\;])\s*/g, '$1\n').replace(/\n+/g, '\n');
-        let lines = cleanCode.split('\n');
-
-        for (let i = 0; i < lines.length; i++) {
-            let line = lines[i].trim();
-            if (!line) continue;
-
-            if (line.startsWith('}') || line.endsWith('}')) {
-                indent--;
-            }
-
-            result += '    '.repeat(Math.max(0, indent)) + line + '\n';
-
-            if (line.endsWith('{') || line.startsWith('{')) {
-                indent++;
-            }
+        if (!input) {
+            alert('Please enter some text or code first!');
+            return;
         }
 
-        codeOutput.value = result.trim();
+        let output = "";
+
+        if (action === 'minify') {
+            resultTitle.innerText = "⚡ Minified Code Output:";
+            // خوارزمية ذكية لضغط الأكواد بإزالة المسافات والأسطر الفارغة والتعليقات
+            output = input
+                .replace(/\/\*[\s\S]*?\*\//g, '') // إزالة تعليقات CSS/*...*/
+                .replace(/\/\/.*$/gm, '')         // إزالة تعليقات JS single line
+                .replace(/\s+/g, ' ')             // ضغط المسافات المتعددة لمسافة واحدة
+                .replace(/\s*([\{\}\:\;\,\=\+\-\*\/])\s*/g, '$1') // إزالة المسافات حول الرموز الأساسية
+                .trim();
+        } else if (action === 'beautify') {
+            resultTitle.innerText = "🎨 Beautified Code Output:";
+            // خوارزمية مبسطة لتنسيق الأكواد وإضافة فواصل أسطر مريحة
+            let indent = 0;
+            output = input
+                .replace(/\s*([\{\}])\s*/g, '$1') // إزالة المسافات حول الأقواس أولاً
+                .replace(/\{/g, ' {\n')
+                .replace(/\}/g, '\n}\n')
+                .replace(/\;/g, ';\n')
+                .split('\n')
+                .map(line => {
+                    line = line.trim();
+                    if (line.startsWith('}')) indent--;
+                    let spacedLine = '    '.repeat(Math.max(0, indent)) + line;
+                    if (line.endsWith('{')) indent++;
+                    return spacedLine;
+                })
+                .join('\n')
+                .replace(/\n\s*\n/g, '\n') // منع الأسطر الفارغة الزائدة
+                .trim();
+        }
+
+        resultPreview.innerText = output;
+        outputArea.style.display = 'block';
+        outputArea.scrollIntoView({ behavior: 'smooth' });
     }
 
-    function copyResult() {
-        if(!codeOutput.value.trim()) return;
-        navigator.clipboard.writeText(codeOutput.value).then(() => {
-            alert('Code copied to clipboard! ✅');
+    function optimizePrompt() {
+        const input = document.getElementById('inputText').value.trim();
+        const resultPreview = document.getElementById('resultPreview');
+        const outputArea = document.getElementById('outputArea');
+        const resultTitle = document.getElementById('resultTitle');
+
+        if (!input) {
+            alert('Please enter a raw prompt description first!');
+            return;
+        }
+
+        resultTitle.innerText = "🚀 Optimized AI Agent Prompt (Ready for Cursor / Replit):";
+
+        // خوارزمية هندسة برومبت مدمجة لتحويل النص العشوائي إلى قالب احترافي يفهمه الذكاء الاصطناعي بدقة عسكرية
+        const optimizedTemplate = `# ROLE & SYSTEM INSTRUCTIONS
+You are an expert elite Software Engineer and Full-Stack Developer. Your goal is to implement the requested features with production-ready, highly optimized, and clean code.
+
+# CONTEXT & PRIMARY TASK
+The user needs to build/modify the following functionality:
+"${input}"
+
+# ARCHITECTURE & TECH STACK REQUIREMENTS
+- Use modern, semantic, and lightweight structure.
+- Adhere strictly to scalable architectural patterns (Modular components, decoupled logic).
+- Ensure fully responsive UI layouts with high-quality user experience design principles.
+
+# CRITICAL CONSTRAINTS & CODE QUALITY CONTROL
+1. DO NOT omit, hallucinate, or leave placeholder code (No "// TODO: implement later").
+2. Ensure strict error-handling mechanisms are wrapped around async blocks, operations, and user inputs.
+3. Keep the file footprint minimal, secure, and highly optimized for performance and rapid deployment.
+4. Maintain clean global scopes and avoid redundant code duplication.
+
+# EXPECTED OUTPUT FORMAT
+Provide the complete, production-grade updated files ready to be copied directly into the workspace.`;
+
+        resultPreview.innerText = optimizedTemplate;
+        outputArea.style.display = 'block';
+        outputArea.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function copyOutput() {
+        const content = document.getElementById('resultPreview').innerText;
+        if (!content) return;
+        navigator.clipboard.writeText(content).then(() => {
+            alert('Result copied successfully to clipboard! 📋');
         });
-    }
-
-    function clearAll() {
-        codeInput.value = '';
-        codeOutput.value = '';
-        updateCount();
     }
 </script>
 
