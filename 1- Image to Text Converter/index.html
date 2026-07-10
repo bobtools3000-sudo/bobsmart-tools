@@ -13,7 +13,7 @@
         .upload-box:hover { background: #f0f4f8; border-color: #2980b9; }
         .upload-icon { font-size: 40px; margin-bottom: 10px; display: block; }
         #imagePreview { max-width: 100%; max-height: 200px; display: none; margin-top: 15px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        textarea { width: 100%; height: 160px; margin-top: 20px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; resize: vertical; font-size: 15px; background: #fafafa; }
+        textarea { width: 100%; height: 160px; margin-top: 20px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; resize: vertical; font-size: 15px; background: #fafafa; font-weight: 500; }
         .btn { display: inline-block; padding: 12px 24px; background: #3498db; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; margin: 15px 5px 0 5px; border: none; cursor: pointer; font-size: 15px; transition: background 0.2s; }
         .btn:hover { background: #2980b9; }
         .btn-back { background: #95a5a6; }
@@ -21,8 +21,8 @@
         .status { margin-top: 15px; font-weight: bold; color: #e67e22; font-size: 15px; }
         .progress-bar { width: 0%; height: 6px; background: #2ecc71; position: absolute; bottom: 0; left: 0; border-radius: 0 0 0 10px; transition: width 0.2s; }
     </style>
-    <!-- استدعاء المكتبة من سيرفر CDN عالمي ومستقر يدعم التشغيل أونلاين -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js"></script>
+    <!-- استدعاء السيرفر المستقر والكامل لملفات التعرف على النصوص -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
 </head>
 <body>
 
@@ -52,7 +52,6 @@
         const file = input.files[0];
         if (!file) return;
 
-        // عرض الصورة المرفوعة فوراً للمستخدم
         const reader = new FileReader();
         reader.onload = function(e) {
             const preview = document.getElementById('imagePreview');
@@ -67,31 +66,39 @@
         const output = document.getElementById('outputBox');
         const pBar = document.getElementById('progressBar');
         
-        status.innerText = "🌀 Initializing AI Engine...";
+        status.innerText = "🌀 Loading AI Language Models...";
         output.value = "";
-        pBar.style.width = "5%";
+        pBar.style.width = "10ftp%";
 
-        // تشغيل محرك التعرف على النصوص الاحترافي
+        // تشغيل المحرك مع تحديد السيرفر البديل المستقر لبيانات اللغة
         Tesseract.recognize(
             file,
             'eng',
             { 
+                workerBlobURL: false,
                 logger: m => {
-                    if(m.status === 'recognizing') {
+                    if(m.status === 'recognizing text') {
                         const progress = Math.round(m.progress * 100);
                         status.innerText = `⏳ Extracting Text: ${progress}%`;
                         pBar.style.width = `${progress}%`;
+                    } else {
+                        status.innerText = `🌀 ${m.status}...`;
                     }
                 } 
             }
         ).then(({ data: { text } }) => {
-            status.innerText = "✅ Success! Text Extracted.";
             pBar.style.width = "100%";
-            output.value = text.trim() ? text.trim() : "No clear text found. Please upload a clear screenshot containing English text.";
+            if (text && text.trim().length > 3) {
+                status.innerText = "✅ Success! Text Extracted.";
+                output.value = text.trim();
+            } else {
+                status.innerText = "⚠️ Done, but no clear text found.";
+                output.value = "We found symbols but no complete text. Please make sure to upload a clear screenshot containing typed English text.";
+            }
         }).catch(err => {
             console.error(err);
-            status.innerText = "❌ Connection error or unsupported image format.";
-            output.value = "Please refresh the page and try again with a standard PNG or JPG screenshot.";
+            status.innerText = "❌ Engine Timeout. Please try again.";
+            output.value = "Error initialization. Please refresh the page and try again.";
         });
     }
 
