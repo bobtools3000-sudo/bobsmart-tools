@@ -3,107 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Image to Text Converter</title>
+    <title>Advanced Text Tools Studio</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; padding: 20px; color: #333; text-align: center; margin: 0; }
         .container { max-width: 650px; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin: 40px auto; }
         h2 { color: #2c3e50; margin-bottom: 5px; font-size: 28px; }
         p.subtitle { color: #7f8c8d; margin-bottom: 25px; font-size: 14px; }
-        .upload-box { border: 2px dashed #3498db; padding: 40px 20px; border-radius: 10px; background: #f9fbfd; cursor: pointer; margin-bottom: 20px; transition: all 0.3s ease; position: relative; }
-        .upload-box:hover { background: #f0f4f8; border-color: #2980b9; }
-        .upload-icon { font-size: 40px; margin-bottom: 10px; display: block; }
-        #imagePreview { max-width: 100%; max-height: 200px; display: none; margin-top: 15px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        textarea { width: 100%; height: 160px; margin-top: 20px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; resize: vertical; font-size: 15px; background: #fafafa; font-weight: 500; }
-        .btn { display: inline-block; padding: 12px 24px; background: #3498db; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; margin: 15px 5px 0 5px; border: none; cursor: pointer; font-size: 15px; transition: background 0.2s; }
-        .btn:hover { background: #2980b9; }
-        .btn-back { background: #95a5a6; }
+        .input-area { margin-bottom: 20px; text-align: left; }
+        label { font-weight: bold; color: #34495e; display: block; margin-bottom: 8px; }
+        textarea { width: 100%; height: 140px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; resize: vertical; font-size: 15px; background: #fafafa; }
+        .tools-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .btn { padding: 12px; background: #3498db; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+        .btn:hover { background: #2980b9; transform: translateY(-1px); }
+        .btn-success { background: #2ecc71; }
+        .btn-success:hover { background: #27ae60; }
+        .btn-purple { background: #9b59b6; }
+        .btn-purple:hover { background: #8e44ad; }
+        .btn-back { background: #95a5a6; grid-column: span 2; margin-top: 10px; text-decoration: none; text-align: center; color: white; line-height: 20px; }
         .btn-back:hover { background: #7f8c8d; }
-        .status { margin-top: 15px; font-weight: bold; color: #e67e22; font-size: 15px; }
-        .progress-bar { width: 0%; height: 6px; background: #2ecc71; position: absolute; bottom: 0; left: 0; border-radius: 0 0 0 10px; transition: width 0.2s; }
     </style>
-    <!-- استدعاء السيرفر المستقر والكامل لملفات التعرف على النصوص -->
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
 </head>
 <body>
 
 <div class="container">
-    <h2>AI Image to Text Converter 🔍 ✨</h2>
-    <p class="subtitle">Extract text from any image instantly. Supports multiple languages with 100% privacy.</p>
+    <h2>Smart Text Analyzer & Converter 📝 ✨</h2>
+    <p class="subtitle">Clean, format, listen, and transform your text instantly with zero delay.</p>
     
-    <div class="upload-box" onclick="document.getElementById('fileInput').click()">
-        <span class="upload-icon">📁</span>
-        <p id="uploadText">Click to upload an image or drag & drop it here</p>
-        <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="processImage(this)">
-        <img id="imagePreview" alt="Preview">
-        <div id="progressBar" class="progress-bar"></div>
+    <div class="input-area">
+        <label for="textBox">Type or Paste your text below:</label>
+        <textarea id="textBox" placeholder="Enter your English text here to format or listen to it..."></textarea>
     </div>
 
-    <div id="statusText" class="status"></div>
-
-    <textarea id="outputBox" readonly placeholder="Extracted text will appear here..."></textarea>
-
-    <button onclick="copyText()" class="btn">Copy Extracted Text 📋</button>
-    <br>
-    <a href="../index.html" class="btn btn-back">Return to Main Hub</a>
+    <div class="tools-grid">
+        <button onclick="transformText('up')" class="btn">UPPERCASE ⬆️</button>
+        <button onclick="transformText('low')" class="btn">lowercase ⬇️</button>
+        <button onclick="transformText('clear')" class="btn">Clear Extra Spaces 🧼</button>
+        <button onclick="speakText()" class="btn btn-purple">Listen to Text 🔊</button>
+        <button onclick="copyText()" class="btn btn-success" style="grid-column: span 2;">Copy Processed Text 📋</button>
+        <a href="../index.html" class="btn btn-back">Return to Main Hub</a>
+    </div>
 </div>
 
 <script>
-    function processImage(input) {
-        const file = input.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const preview = document.getElementById('imagePreview');
-            const uploadText = document.getElementById('uploadText');
-            preview.src = e.target.result;
-            preview.style.display = 'inline-block';
-            uploadText.style.display = 'none';
-        }
-        reader.readAsDataURL(file);
-
-        const status = document.getElementById('statusText');
-        const output = document.getElementById('outputBox');
-        const pBar = document.getElementById('progressBar');
+    function transformText(type) {
+        const txtBox = document.getElementById('textBox');
+        if(!txtBox.value) return alert('Please enter some text first!');
         
-        status.innerText = "🌀 Loading AI Language Models...";
-        output.value = "";
-        pBar.style.width = "10ftp%";
+        if(type === 'up') {
+            txtBox.value = txtBox.value.toUpperCase();
+        } else if(type === 'low') {
+            txtBox.value = txtBox.value.toLowerCase();
+        } else if(type === 'clear') {
+            txtBox.value = txtBox.value.replace(/\s+/g, ' ').trim();
+        }
+    }
 
-        // تشغيل المحرك مع تحديد السيرفر البديل المستقر لبيانات اللغة
-        Tesseract.recognize(
-            file,
-            'eng',
-            { 
-                workerBlobURL: false,
-                logger: m => {
-                    if(m.status === 'recognizing text') {
-                        const progress = Math.round(m.progress * 100);
-                        status.innerText = `⏳ Extracting Text: ${progress}%`;
-                        pBar.style.width = `${progress}%`;
-                    } else {
-                        status.innerText = `🌀 ${m.status}...`;
-                    }
-                } 
-            }
-        ).then(({ data: { text } }) => {
-            pBar.style.width = "100%";
-            if (text && text.trim().length > 3) {
-                status.innerText = "✅ Success! Text Extracted.";
-                output.value = text.trim();
-            } else {
-                status.innerText = "⚠️ Done, but no clear text found.";
-                output.value = "We found symbols but no complete text. Please make sure to upload a clear screenshot containing typed English text.";
-            }
-        }).catch(err => {
-            console.error(err);
-            status.innerText = "❌ Engine Timeout. Please try again.";
-            output.value = "Error initialization. Please refresh the page and try again.";
-        });
+    function speakText() {
+        const txtBox = document.getElementById('textBox');
+        if(!txtBox.value) return alert('Please enter text to read aloud!');
+        
+        // استخدام محرك الصوت المدمج بالمتصفح مباشرة بدون سيرفرات خارجية
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(txtBox.value);
+        utterance.lang = 'en-US';
+        window.speechSynthesis.speak(utterance);
     }
 
     function copyText() {
-        const textBox = document.getElementById('outputBox');
+        const textBox = document.getElementById('textBox');
         if(!textBox.value) return;
         textBox.select();
         document.execCommand('copy');
