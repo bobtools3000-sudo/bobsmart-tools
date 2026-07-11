@@ -4,62 +4,44 @@
     <meta charset="UTF-8">
     <title>باني السيرة الذاتية الاحترافي</title>
     <style>
-        body { font-family: 'Cairo', sans-serif; display: flex; padding: 20px; gap: 20px; background: #f0f2f5; }
-        .form-section { width: 40%; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .preview-section { width: 60%; background: white; padding: 40px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.05); min-height: 800px; }
-        input, textarea, select { width: 100%; margin-bottom: 15px; padding: 12px; border: 1px solid #ccc; border-radius: 8px; }
-        h2 { color: #007bff; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        .cv-header { text-align: center; margin-bottom: 30px; }
-        button { background: #007bff; color: white; padding: 15px; width: 100%; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; margin-top: 10px; }
+        body { font-family: 'Arial', sans-serif; display: flex; gap: 20px; padding: 20px; background: #f4f4f9; }
+        .editor { width: 35%; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .preview { width: 65%; background: #fff; padding: 50px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); min-height: 900px; }
+        input, textarea, select { width: 100%; margin-bottom: 15px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; }
+        .section-title { font-weight: bold; color: #3498db; margin-top: 20px; border-bottom: 1px solid #ddd; }
+        .print-btn { background: #3498db; color: white; padding: 15px; border: none; width: 100%; cursor: pointer; border-radius: 5px; font-size: 16px; }
     </style>
 </head>
 <body>
 
-<div class="form-section">
-    <h2>أدخل بياناتك الاحترافية</h2>
-    <input type="text" id="name" placeholder="الاسم الكامل" oninput="updateCV()">
-    <input type="email" id="email" placeholder="البريد الإلكتروني" oninput="updateCV()">
-    <input type="text" id="phone" placeholder="رقم الواتساب" oninput="updateCV()">
-    <textarea id="summary" placeholder="ملخص احترافي عن خبراتك..." oninput="updateCV()"></textarea>
-    
-    <label>اختر أهم مهاراتك:</label>
-    <select id="skills" onchange="addSkill()" multiple>
-        <option value="البرمجة (Programming)">البرمجة</option>
-        <option value="إدارة المشاريع (Project Management)">إدارة المشاريع</option>
-        <option value="التصميم الجرافيكي (Graphic Design)">التصميم الجرافيكي</option>
-        <option value="تحليل البيانات (Data Analysis)">تحليل البيانات</option>
-    </select>
-    <p><small>اضغط Ctrl لاختيار أكثر من مهارة</small></p>
+<div class="editor">
+    <h2>بياناتك</h2>
+    <input type="text" id="name" placeholder="الاسم الكامل" oninput="render()">
+    <input type="text" id="job" placeholder="المسمى الوظيفي" oninput="render()">
+    <input type="email" id="email" placeholder="البريد الإلكتروني" oninput="render()">
+    <textarea id="exp" placeholder="الخبرة العملية (اكتب كل خبرة في سطر)" oninput="render()"></textarea>
+    <textarea id="skills" placeholder="المهارات (افصل بينها بفاصلة)" oninput="render()"></textarea>
+    <button class="print-btn" onclick="window.print()">تحميل PDF احترافي</button>
 </div>
 
-<div class="preview-section" id="cv">
-    <div class="cv-header">
-        <h1 id="outName">الاسم الكامل</h1>
-        <p>إيميل: <span id="outEmail">...</span> | واتساب: <span id="outPhone">...</span></p>
-    </div>
-    <h2>الملخص المهني</h2>
-    <p id="outSummary">...</p>
-    <h2>المهارات</h2>
-    <ul id="outSkills"></ul>
-    <button onclick="window.print()">تحميل كـ PDF احترافي</button>
+<div class="preview" id="cv">
+    <h1 id="pName">الاسم</h1>
+    <h3 id="pJob">المسمى الوظيفي</h3>
+    <p id="pEmail">البريد الإلكتروني</p>
+    <div class="section-title">الخبرة العملية</div>
+    <div id="pExp"></div>
+    <div class="section-title">المهارات</div>
+    <div id="pSkills"></div>
 </div>
 
 <script>
-    function updateCV() {
-        document.getElementById('outName').innerText = document.getElementById('name').value;
-        document.getElementById('outEmail').innerText = document.getElementById('email').value;
-        document.getElementById('outPhone').innerText = document.getElementById('phone').value;
-        document.getElementById('outSummary').innerText = document.getElementById('summary').value;
-    }
-    function addSkill() {
-        const skillsSelect = document.getElementById('skills');
-        const list = document.getElementById('outSkills');
-        list.innerHTML = "";
-        Array.from(skillsSelect.selectedOptions).forEach(option => {
-            const li = document.createElement('li');
-            li.innerText = option.value;
-            list.appendChild(li);
-        });
+    function render() {
+        document.getElementById('pName').innerText = document.getElementById('name').value;
+        document.getElementById('pJob').innerText = document.getElementById('job').value;
+        document.getElementById('pEmail').innerText = document.getElementById('email').value;
+        document.getElementById('pExp').innerText = document.getElementById('exp').value;
+        document.getElementById('pSkills').innerText = document.getElementById('skills').value;
     }
 </script>
 </body>
