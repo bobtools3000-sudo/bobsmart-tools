@@ -11,7 +11,7 @@
         #qrcode { margin: 20px auto; width: 200px; height: 200px; }
         #reader { width: 100%; max-width: 400px; margin: 20px auto; border: 1px solid #ccc; }
         input { padding: 10px; width: 80%; margin-bottom: 10px; }
-        button { padding: 10px 20px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 5px; margin: 5px; }
+        button { padding: 15px 25px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 8px; margin: 10px; font-size: 16px; }
     </style>
 </head>
 <body>
@@ -40,29 +40,31 @@
             }
         }
 
-        // 2. وظيفة المسح (مع إجبار الكاميرا الخلفية)
+        // 2. وظيفة المسح النهائية
         function startScan() {
             const html5QrCode = new Html5Qrcode("reader");
             
-            // إجبار الكاميرا الخلفية (environment)
             html5QrCode.start(
                 { facingMode: { exact: "environment" } }, 
                 { fps: 10, qrbox: 250 },
                 (decodedText) => {
-                    alert("تم العثور على: " + decodedText);
-                    html5QrCode.stop(); // إيقاف الكاميرا بعد القراءة
+                    // هنا سيتم فتح الرابط فوراً في نافذة جديدة
+                    window.open(decodedText, '_blank');
+                    html5QrCode.stop(); // إيقاف الكاميرا بعد الفتح
                 },
                 (errorMessage) => {
-                    // نتجاهل الأخطاء العادية لأنها تظهر أثناء بحث الكاميرا عن كود
+                    // صمت عن الأخطاء أثناء المسح
                 }
             ).catch((err) => {
-                // إذا فشلت الكاميرا الخلفية، جرب الكاميرا المتاحة (fallback)
-                alert("تعذر الوصول للكاميرا الخلفية، جارٍ تجربة الكاميرا المتاحة...");
+                // في حال فشل الكاميرا الخلفية، جرب الأمامية
                 html5QrCode.start(
-                    { facingMode: "user" }, // الكاميرا الأمامية
+                    { facingMode: "user" }, 
                     { fps: 10, qrbox: 250 },
-                    (decodedText) => { alert("تم العثور على: " + decodedText); html5QrCode.stop(); }
-                ).catch(err => alert("حدث خطأ: " + err));
+                    (decodedText) => { 
+                        window.open(decodedText, '_blank'); 
+                        html5QrCode.stop(); 
+                    }
+                );
             });
         }
     </script>
