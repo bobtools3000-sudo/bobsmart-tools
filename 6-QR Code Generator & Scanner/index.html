@@ -1,54 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>QR Code Generator & Scanner</title>
-    <style>
-        body { font-family: sans-serif; background-color: #f4f7f6; padding: 40px; color: #333; text-align: center; }
-        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 500px; margin: auto; }
-        h2 { color: #2c3e50; }
-        input { width: 85%; padding: 12px; margin: 15px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
-        button { padding: 12px 25px; background: #3498db; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; width: 90%; }
-        button:hover { background: #2980b9; }
-        #qrCode { margin-top: 25px; display: flex; justify-content: center; }
-        .points-badge { display: inline-block; background: #f1c40f; color: #2c3e50; padding: 5px 15px; border-radius: 20px; font-weight: bold; margin-top: 15px; }
-    </style>
+    <title>أداة QR الذكية</title>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
 <body>
+    <h1>مولد وقارئ QR</h1>
 
-    <div class="container">
-        <h2>QR Code Generator & Scanner</h2>
-        <p>Enter a URL or text below to instantly generate a QR code</p>
-        <input type="text" id="textInput" placeholder="https://google.com or any text...">
-        <br>
-        <button onclick="generateQR()">Create QR Code</button>
-        <div id="qrCode"></div>
-        <div class="points-badge" id="pointsDisplay">⭐ Total Points: 0 XP</div>
-    </div>
+    <input type="text" id="textInput" placeholder="أدخل الرابط أو النص هنا...">
+    <button onclick="generateQR()">توليد QR</button>
+    <div id="qrcode" style="margin-top:20px;"></div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script>
-        // نظام الـ Gamification والمكافآت
-        let points = parseInt(localStorage.getItem('userPoints')) || 0;
-        document.getElementById('pointsDisplay').innerText = `⭐ Total Points: ${points} XP`;
+    <hr>
 
-        function generateQR() {
-            const container = document.getElementById("qrCode");
-            const text = document.getElementById("textInput").value.trim();
-            container.innerHTML = "";
-            
-            if (text === "") {
-                alert("Please enter some text or a URL first!");
-                return;
-            }
-            
-            new QRCode(container, { text: text, width: 200, height: 200, colorDark : "#2c3e50", colorLight : "#ffffff" });
+    <button onclick="startScan()">بدء المسح بالكاميرا</button>
+    <div id="reader" style="width: 300px;"></div>
 
-            // إضافة نقاط عند التوليد الناجح
-            points += 15;
-            localStorage.setItem('userPoints', points);
-            document.getElementById('pointsDisplay').innerText = `⭐ Total Points: ${points} XP`;
-        }
-    </script>
+    <script src="guide.js"></script>
 </body>
 </html>
