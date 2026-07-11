@@ -9,40 +9,60 @@
     <style>
         body { font-family: sans-serif; text-align: center; padding: 20px; }
         #qrcode { margin: 20px auto; width: 200px; height: 200px; }
-        #reader { width: 100%; max-width: 400px; margin: 20px auto; }
-        input { padding: 10px; width: 80%; }
+        #reader { width: 100%; max-width: 400px; margin: 20px auto; border: 1px solid #ccc; }
+        input { padding: 10px; width: 80%; margin-bottom: 10px; }
         button { padding: 10px 20px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 5px; margin: 5px; }
     </style>
 </head>
 <body>
     <h1>مولد وقارئ QR</h1>
     
-    <input type="text" id="textInput" placeholder="أدخل الرابط هنا...">
+    <input type="text" id="textInput" placeholder="أدخل الرابط أو النص هنا...">
+    <br>
     <button onclick="generateQR()">توليد QR</button>
     <div id="qrcode"></div>
 
     <hr>
 
-    <button onclick="startScan()">بدء المسح بالكاميرا</button>
+    <button onclick="startScan()">بدء المسح بالكاميرا الخلفية</button>
     <div id="reader"></div>
 
     <script>
+        // 1. وظيفة التوليد
         function generateQR() {
             const text = document.getElementById('textInput').value;
             const qrcodeDiv = document.getElementById("qrcode");
             qrcodeDiv.innerHTML = "";
             if(text.trim() !== "") {
-                new QRCode(qrcodeDiv, { text: text, width: 200, height: 200 });
+                new QRCode(qrcodeDiv, { text: text, width: 200, height: 200, correctLevel: 2 });
             } else {
                 alert("يرجى إدخال نص!");
             }
         }
 
+        // 2. وظيفة المسح (مع إجبار الكاميرا الخلفية)
         function startScan() {
-            const scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
-            scanner.render((text) => {
-                alert("تمت القراءة: " + text);
-                scanner.clear();
+            const html5QrCode = new Html5Qrcode("reader");
+            
+            // إجبار الكاميرا الخلفية (environment)
+            html5QrCode.start(
+                { facingMode: { exact: "environment" } }, 
+                { fps: 10, qrbox: 250 },
+                (decodedText) => {
+                    alert("تم العثور على: " + decodedText);
+                    html5QrCode.stop(); // إيقاف الكاميرا بعد القراءة
+                },
+                (errorMessage) => {
+                    // نتجاهل الأخطاء العادية لأنها تظهر أثناء بحث الكاميرا عن كود
+                }
+            ).catch((err) => {
+                // إذا فشلت الكاميرا الخلفية، جرب الكاميرا المتاحة (fallback)
+                alert("تعذر الوصول للكاميرا الخلفية، جارٍ تجربة الكاميرا المتاحة...");
+                html5QrCode.start(
+                    { facingMode: "user" }, // الكاميرا الأمامية
+                    { fps: 10, qrbox: 250 },
+                    (decodedText) => { alert("تم العثور على: " + decodedText); html5QrCode.stop(); }
+                ).catch(err => alert("حدث خطأ: " + err));
             });
         }
     </script>
