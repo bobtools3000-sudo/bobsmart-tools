@@ -1,32 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guide: QR Code Tool</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; padding: 40px; background-color: #f9f9f9; line-height: 1.6; color: #333; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 10px; border: 1px solid #ddd; }
-        h1 { color: #5d6d7e; }
-        .btn-nav { display: inline-block; padding: 12px 20px; background: #5d6d7e; color: white; text-decoration: none; border-radius: 5px; margin-top: 20px; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>📱 QR Code Generator & Scanner Guide</h1>
-        <p>This tool allows you to create custom QR codes for URLs or text and scan existing QR code images to extract their content.</p>
-        
-        <h3>How to use:</h3>
-        <ul>
-            <li><strong>To Generate:</strong> Paste your URL or text into the input field and click "Create QR Code".</li>
-            <li><strong>To Scan:</strong> Click "Scan QR Code Image" to upload an existing code from your device.</li>
-        </ul>
+// وظيفة التوليد
+function generateQR() {
+    var text = document.getElementById('textInput').value;
+    var qrcodeDiv = document.getElementById("qrcode");
+    
+    qrcodeDiv.innerHTML = ""; // تنظيف المكان
+    
+    if(text.trim() !== "") {
+        new QRCode(qrcodeDiv, {
+            text: text,
+            width: 200,
+            height: 200,
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    } else {
+        alert("يرجى إدخال نص!");
+    }
+}
 
-        <div style="background: #f4f6f7; padding: 15px; border-radius: 5px; margin-top: 20px; border-left: 5px solid #5d6d7e;">
-            <strong>🏆 Gamification:</strong> Successfully create or scan your first QR code to earn <strong>+15 points</strong>!
-        </div>
-
-        <a href="../index.html" class="btn-nav">⬅ Return to Main Hub</a>
-    </div>
-</body>
-</html>
+// وظيفة المسح
+function startScan() {
+    const scanner = new Html5QrcodeScanner("reader", { 
+        fps: 10, 
+        qrbox: 250 
+    });
+    
+    scanner.render((text) => {
+        alert("تمت القراءة بنجاح: " + text);
+        scanner.clear(); // إغلاق الكاميرا بعد القراءة
+    });
+}
