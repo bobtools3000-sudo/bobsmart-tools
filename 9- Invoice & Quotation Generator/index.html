@@ -1,166 +1,44 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSON Formatter & Validator</title>
+    <title>مولد الفواتير وعروض الأسعار</title>
     <style>
-        :root {
-            --primary: #2c3e50;
-            --accent: #e67e22;
-            --success: #2ecc71;
-            --error: #e74c3c;
-            --bg: #f5f6fa;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: #fff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-        h1 { text-align: center; color: var(--primary); margin-bottom: 25px; }
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
-        .pane {
-            display: flex;
-            flex-direction: column;
-        }
-        label {
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: #34495e;
-        }
-        textarea {
-            width: 100%;
-            height: 350px;
-            padding: 15px;
-            border: 1px solid #dcdde1;
-            border-radius: 8px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 14px;
-            box-sizing: border-box;
-            resize: vertical;
-            background: #fafafa;
-            outline: none;
-        }
-        textarea:focus { border-color: var(--accent); }
-        .btn-group {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        .btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
-            color: white;
-        }
-        .btn-format { background-color: var(--accent); }
-        .btn-format:hover { background-color: #d35400; }
-        .btn-copy { background-color: #3498db; }
-        .btn-copy:hover { background-color: #2980b9; }
-        
-        .status-box {
-            margin-top: 15px;
-            padding: 12px;
-            border-radius: 6px;
-            font-weight: bold;
-            display: none;
-            font-size: 14px;
-        }
-        .status-success { background-color: #e8f8f5; color: var(--success); border: 1px solid var(--success); }
-        .status-error { background-color: #fceae8; color: var(--error); border: 1px solid var(--error); }
+        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
+        .container { background: white; padding: 30px; border-radius: 10px; max-width: 600px; margin: auto; }
+        input, textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+        button { background: #27ae60; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>JSON Formatter & Validator 💻🔍</h1>
-    <p style="text-align: center; color: #718093; margin-bottom: 25px;">Paste your raw JSON on the left to validate and format it perfectly on the right.</p>
-    
-    <div class="grid">
-        <div class="pane">
-            <label for="json-input">Raw / Minified JSON:</label>
-            <textarea id="json-input" placeholder='Paste your JSON code here...&#10;e.g., {"name":"John","age":30,"city":"NY"}'></textarea>
-        </div>
-        <div class="pane">
-            <label for="json-output">Formatted & Clean JSON:</label>
-            <textarea id="json-output" placeholder="Beautiful output will appear here..." readonly></textarea>
-        </div>
-    </div>
-
-    <div id="status-msg" class="status-box"></div>
-
-    <div class="btn-group">
-        <button class="btn btn-format" onclick="processJSON()">Format & Validate ⚡</button>
-        <button class="btn btn-copy" onclick="copyJSON()">Copy Result 📋</button>
-        <button class="btn" style="background-color: #7f8c8d; max-width: 150px;" onclick="clearAll()">Clear 🔄</button>
-    </div>
+    <h2>إنشاء فاتورة جديدة</h2>
+    <input type="text" id="clientName" placeholder="اسم العميل">
+    <input type="text" id="serviceName" placeholder="اسم الخدمة/المنتج">
+    <input type="number" id="price" placeholder="السعر">
+    <button onclick="generateInvoice()">توليد الفاتورة (PDF)</button>
+    <div id="output"></div>
 </div>
 
 <script>
-    function processJSON() {
-        const input = document.getElementById('json-input').value.trim();
-        const output = document.getElementById('json-output');
-        const statusMsg = document.getElementById('status-msg');
+    function generateInvoice() {
+        const client = document.getElementById('clientName').value;
+        const service = document.getElementById('serviceName').value;
+        const price = document.getElementById('price').value;
 
-        // إخفاء صندوق الحالة المبدئي
-        statusMsg.style.display = 'none';
-        statusMsg.className = 'status-box';
-
-        if (!input) {
-            alert("Please paste some JSON data first!");
+        if(!client || !price) {
+            alert("يرجى تعبئة الحقول الأساسية!");
             return;
         }
 
-        try {
-            // محاولة قراءة وتنسيق الكود بمحاذاة 4 مسافات
-            const parsedObj = JSON.parse(input);
-            output.value = JSON.stringify(parsedObj, null, 4);
-            
-            // إظهار حالة النجاح
-            statusMsg.innerText = "Valid JSON! Beautifully formatted. ✅";
-            statusMsg.classList.add('status-success');
-            statusMsg.style.display = 'block';
-        } catch (error) {
-            // إظهار حالة الخطأ وتحديد موقعه للمطور
-            output.value = "";
-            statusMsg.innerText = "Invalid JSON: " + error.message;
-            statusMsg.classList.add('status-error');
-            statusMsg.style.display = 'block';
-        }
-    }
-
-    function copyJSON() {
-        const output = document.getElementById('json-output').value;
-        if (!output.trim()) return;
-        navigator.clipboard.writeText(output).then(() => {
-            alert('Formatted JSON copied to clipboard! ✅');
-        });
-    }
-
-    function clearAll() {
-        document.getElementById('json-input').value = "";
-        document.getElementById('json-output').value = "";
-        const statusMsg = document.getElementById('status-msg');
-        statusMsg.style.display = 'none';
+        document.getElementById('output').innerHTML = `
+            <h3>فاتورة موجهة لـ: ${client}</h3>
+            <p>الخدمة: ${service}</p>
+            <p>الإجمالي: ${price} ريال</p>
+            <p><strong>تم التوليد بنجاح!</strong></p>
+        `;
+        // هنا سنضيف لاحقاً مكتبة jsPDF لتحويل هذا للـ PDF
     }
 </script>
 
