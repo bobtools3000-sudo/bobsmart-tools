@@ -2,69 +2,56 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>باني السيرة الذاتية الاحترافي الكامل</title>
+    <title>مؤقت التركيز (Pomodoro)</title>
     <style>
-        /* التنسيق الأساسي */
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f6f9; display: flex; padding: 20px; gap: 20px; }
-        .form-panel { width: 40%; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); height: 90vh; overflow-y: auto; }
-        .preview-panel { width: 60%; }
-        input, textarea { width: 100%; margin-bottom: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
-        .cv-container { display: flex; background: #fff; border-radius: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); overflow: hidden; min-height: 800px; }
-        .sidebar { background: #1e2a38; color: #fff; width: 35%; padding: 30px; }
-        .main-content { width: 65%; padding: 30px; color: #2d3748; }
-        .section-title { font-size: 18px; font-weight: 600; margin-bottom: 10px; border-bottom: 2px solid #a0c4ff; padding-bottom: 5px; margin-top: 15px; }
-        .item-title { font-weight: 700; }
-        button { background: #28a745; color: white; padding: 12px; width: 100%; border: none; cursor: pointer; border-radius: 5px; margin-top: 15px; font-size: 16px; }
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f4f6f9; }
+        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: center; width: 300px; }
+        #timer { font-size: 48px; font-weight: bold; color: #e74c3c; margin: 20px 0; }
+        button { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; color: white; }
+        #start-btn { background: #3498db; }
+        #reset-btn { background: #95a5a6; }
     </style>
 </head>
 <body>
 
-<div class="form-panel">
-    <h2>أدخل بياناتك الكاملة</h2>
-    <input type="text" id="name" placeholder="الاسم الكامل" oninput="update()">
-    <input type="text" id="title" placeholder="المسمى الوظيفي" oninput="update()">
-    <input type="text" id="phone" placeholder="رقم الهاتف/واتساب" oninput="update()">
-    <input type="email" id="email" placeholder="البريد الإلكتروني" oninput="update()">
-    <textarea id="summary" placeholder="الملخص المهني" oninput="update()"></textarea>
-    <textarea id="experience" placeholder="الخبرة المهنية (الشركة، التاريخ، الوصف)" oninput="update()"></textarea>
-    <textarea id="education" placeholder="المؤهلات العلمية" oninput="update()"></textarea>
-    <textarea id="skills" placeholder="المهارات (افصل بينها بفاصلة)" oninput="update()"></textarea>
-    <button onclick="window.print()">تصدير PDF احترافي</button>
-</div>
-
-<div class="preview-panel">
-    <div class="cv-container">
-        <aside class="sidebar">
-            <h1 id="outName" style="font-size: 24px;">الاسم</h1>
-            <p id="outTitle" style="color: #a0c4ff;">المسمى الوظيفي</p>
-            <h2 class="section-title">معلومات الاتصال</h2>
-            <p id="outPhone">...</p>
-            <p id="outEmail">...</p>
-            <h2 class="section-title">المهارات</h2>
-            <p id="outSkills">...</p>
-        </aside>
-        <main class="main-content">
-            <h2 class="section-title">الملخص المهني</h2>
-            <p id="outSummary">...</p>
-            <h2 class="section-title">الخبرة المهنية</h2>
-            <p id="outExperience">...</p>
-            <h2 class="section-title">المؤهلات العلمية</h2>
-            <p id="outEducation">...</p>
-        </main>
-    </div>
+<div class="container">
+    <h2 id="status">TIME TO FOCUS!</h2>
+    <div id="timer">25:00</div>
+    <button id="start-btn" onclick="startTimer()">Start 🚀</button>
+    <button id="reset-btn" onclick="resetTimer()">Reset ⏹</button>
 </div>
 
 <script>
-    function update() {
-        document.getElementById('outName').innerText = document.getElementById('name').value;
-        document.getElementById('outTitle').innerText = document.getElementById('title').value;
-        document.getElementById('outPhone').innerText = document.getElementById('phone').value;
-        document.getElementById('outEmail').innerText = document.getElementById('email').value;
-        document.getElementById('outSummary').innerText = document.getElementById('summary').value;
-        document.getElementById('outExperience').innerText = document.getElementById('experience').value;
-        document.getElementById('outEducation').innerText = document.getElementById('education').value;
-        document.getElementById('outSkills').innerText = document.getElementById('skills').value;
+    let timeLeft = 1500; // 25 دقيقة
+    let timerId = null;
+
+    function updateDisplay() {
+        let minutes = Math.floor(timeLeft / 60);
+        let seconds = timeLeft % 60;
+        document.getElementById('timer').innerText = 
+            `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    function startTimer() {
+        if (timerId !== null) return; 
+        timerId = setInterval(() => {
+            timeLeft--;
+            updateDisplay();
+            if (timeLeft <= 0) {
+                clearInterval(timerId);
+                timerId = null;
+                alert("انتهى وقت التركيز!");
+            }
+        }, 1000);
+    }
+
+    function resetTimer() {
+        clearInterval(timerId); // إيقاف العداد
+        timerId = null; // تفريغ المعرف
+        timeLeft = 1500; // إعادة الضبط لـ 25 دقيقة
+        updateDisplay(); // تحديث العرض
     }
 </script>
+
 </body>
 </html>
