@@ -1,57 +1,41 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <title>مولد الفواتير وعروض الأسعار</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <title>Invoice & Quotation Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; padding: 20px; display: flex; justify-content: center; }
-        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; display: flex; justify-content: center; }
+        .invoice-box { background: white; padding: 30px; border-radius: 10px; max-width: 600px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         h2 { color: #2c3e50; text-align: center; }
         input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        button { width: 100%; background: #27ae60; color: white; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        button { width: 100%; background: #27ae60; color: white; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
         button:hover { background: #219150; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>إنشاء فاتورة جديدة</h2>
-    <input type="text" id="clientName" placeholder="اسم العميل">
-    <input type="text" id="serviceName" placeholder="اسم الخدمة/المنتج">
-    <input type="number" id="price" placeholder="السعر">
-    <button onclick="generateInvoice()">توليد الفاتورة (PDF)</button>
+<div class="invoice-box" id="invoice-content">
+    <h2>Invoice Generator</h2>
+    <input type="text" id="clientName" placeholder="Client Name">
+    <input type="text" id="serviceName" placeholder="Service / Product">
+    <input type="number" id="price" placeholder="Price">
+    <button onclick="downloadPDF()">Download PDF</button>
 </div>
 
 <script>
-    function generateInvoice() {
-        const { jsPDF } = window.jspdf;
-        const client = document.getElementById('clientName').value;
-        const service = document.getElementById('serviceName').value;
-        const price = document.getElementById('price').value;
-
-        // التحقق من البيانات قبل التوليد
-        if(!client || !service || !price) {
-            alert("يرجى تعبئة كافة الحقول المطلوبة!");
-            return;
-        }
-
-        // إنشاء مستند PDF
-        const doc = new jsPDF();
-        
-        // إضافة النصوص (ملاحظة: دعم اللغة العربية يتطلب خطوطاً خاصة، هذا عرض أساسي)
-        doc.setFontSize(20);
-        doc.text("Invoice / فاتورة", 105, 20, { align: 'center' });
-        
-        doc.setFontSize(14);
-        doc.text("العميل: " + client, 20, 40);
-        doc.text("الخدمة: " + service, 20, 50);
-        doc.text("الإجمالي: " + price + " ريال", 20, 60);
-
-        // تحميل الملف تلقائياً
-        doc.save('invoice.pdf');
+    function downloadPDF() {
+        const element = document.getElementById('invoice-content');
+        const opt = {
+            margin:       1,
+            filename:     'invoice.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2 },
+            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+        // Convert the content to PDF and trigger download
+        html2pdf().set(opt).from(element).save();
     }
 </script>
-
 </body>
 </html>
