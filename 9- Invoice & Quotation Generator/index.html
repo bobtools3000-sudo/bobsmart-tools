@@ -1,40 +1,43 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Invoice & Quotation Generator</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <title>Invoice Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; display: flex; justify-content: center; }
-        .invoice-box { background: white; padding: 30px; border-radius: 10px; max-width: 600px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        h2 { color: #2c3e50; text-align: center; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        button { width: 100%; background: #27ae60; color: white; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
-        button:hover { background: #219150; }
+        body { font-family: sans-serif; background: #f4f7f6; padding: 20px; }
+        .box { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 8px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; }
+        button { width: 100%; padding: 10px; background: #27ae60; color: white; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="invoice-box" id="invoice-content">
+<div class="box">
     <h2>Invoice Generator</h2>
-    <input type="text" id="clientName" placeholder="Client Name">
-    <input type="text" id="serviceName" placeholder="Service / Product">
-    <input type="number" id="price" placeholder="Price">
-    <button onclick="downloadPDF()">Download PDF</button>
+    <input type="text" id="client" placeholder="Client Name">
+    <input type="text" id="service" placeholder="Service">
+    <input type="text" id="price" placeholder="Price">
+    <button onclick="createPDF()">Download PDF</button>
 </div>
 
 <script>
-    function downloadPDF() {
-        const element = document.getElementById('invoice-content');
-        const opt = {
-            margin:       1,
-            filename:     'invoice.pdf',
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2 },
-            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-        };
-        // Convert the content to PDF and trigger download
-        html2pdf().set(opt).from(element).save();
+    function createPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        const client = document.getElementById('client').value;
+        const service = document.getElementById('service').value;
+        const price = document.getElementById('price').value;
+
+        // إضافة النصوص (هذا لا يحتاج تصوير، هو يكتب نصوصاً مباشرة)
+        doc.text("Invoice Details", 20, 20);
+        doc.text("Client: " + client, 20, 30);
+        doc.text("Service: " + service, 20, 40);
+        doc.text("Price: " + price, 20, 50);
+
+        // تحميل الملف
+        doc.save("invoice_clean.pdf");
     }
 </script>
 </body>
