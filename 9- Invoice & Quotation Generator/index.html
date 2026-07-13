@@ -3,11 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>مولد الفواتير وعروض الأسعار</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
-        .container { background: white; padding: 30px; border-radius: 10px; max-width: 600px; margin: auto; }
-        input, textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
-        button { background: #27ae60; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; padding: 20px; display: flex; justify-content: center; }
+        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
+        h2 { color: #2c3e50; text-align: center; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; background: #27ae60; color: white; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        button:hover { background: #219150; }
     </style>
 </head>
 <body>
@@ -18,27 +21,35 @@
     <input type="text" id="serviceName" placeholder="اسم الخدمة/المنتج">
     <input type="number" id="price" placeholder="السعر">
     <button onclick="generateInvoice()">توليد الفاتورة (PDF)</button>
-    <div id="output"></div>
 </div>
 
 <script>
     function generateInvoice() {
+        const { jsPDF } = window.jspdf;
         const client = document.getElementById('clientName').value;
         const service = document.getElementById('serviceName').value;
         const price = document.getElementById('price').value;
 
-        if(!client || !price) {
-            alert("يرجى تعبئة الحقول الأساسية!");
+        // التحقق من البيانات قبل التوليد
+        if(!client || !service || !price) {
+            alert("يرجى تعبئة كافة الحقول المطلوبة!");
             return;
         }
 
-        document.getElementById('output').innerHTML = `
-            <h3>فاتورة موجهة لـ: ${client}</h3>
-            <p>الخدمة: ${service}</p>
-            <p>الإجمالي: ${price} ريال</p>
-            <p><strong>تم التوليد بنجاح!</strong></p>
-        `;
-        // هنا سنضيف لاحقاً مكتبة jsPDF لتحويل هذا للـ PDF
+        // إنشاء مستند PDF
+        const doc = new jsPDF();
+        
+        // إضافة النصوص (ملاحظة: دعم اللغة العربية يتطلب خطوطاً خاصة، هذا عرض أساسي)
+        doc.setFontSize(20);
+        doc.text("Invoice / فاتورة", 105, 20, { align: 'center' });
+        
+        doc.setFontSize(14);
+        doc.text("العميل: " + client, 20, 40);
+        doc.text("الخدمة: " + service, 20, 50);
+        doc.text("الإجمالي: " + price + " ريال", 20, 60);
+
+        // تحميل الملف تلقائياً
+        doc.save('invoice.pdf');
     }
 </script>
 
